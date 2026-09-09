@@ -75,11 +75,12 @@ jobs:
             payload: dist/Colorful Rivals.app
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12.14'
           cache: pip
+          cache-dependency-path: requirements-build.txt
       - name: Install build tools
         run: python -m pip install -r requirements-build.txt
       - name: Verify source
@@ -97,7 +98,7 @@ jobs:
         run: python scripts/smoke_test_release.py --payload "${{ matrix.payload }}"
       - name: Package platform release
         run: python scripts/package_release.py --platform "${{ matrix.platform }}" --payload "${{ matrix.payload }}" --output release-assets --version "${{ inputs.version }}"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: platform-${{ matrix.platform }}
           path: release-assets/*.zip
@@ -107,8 +108,8 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
         with:
           pattern: platform-*
           path: platform-assets
@@ -120,7 +121,7 @@ jobs:
           python3 scripts/package_release.py --combine platform-assets --output release-assets --version "${{ inputs.version }}"
           python3 scripts/package_release.py --presets --output release-assets --version "${{ inputs.version }}"
           cp platform-assets/*.zip release-assets/
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Colorful-Rivals-${{ inputs.version }}
           path: release-assets/*.zip
