@@ -118,7 +118,6 @@ jobs:
         run: python3 scripts/fetch_runtime_licenses.py
       - name: Assemble downloads
         run: |
-          python3 scripts/package_release.py --combine platform-assets --output release-assets --version "${{ inputs.version }}"
           python3 scripts/package_release.py --presets --output release-assets --version "${{ inputs.version }}"
           cp platform-assets/*.zip release-assets/
       - uses: actions/upload-artifact@v7

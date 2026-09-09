@@ -16,7 +16,6 @@ GitHub releases provide these downloads:
 
 1. **Colorful-Rivals-Vibrant-Preset** contains a ready-made mod. It does not contain or run a program.
 2. Five platform-specific archives contain the configurator for Windows x64, Linux x64, Linux ARM64, macOS Intel, and macOS Apple Silicon. These archives are intended to be listed separately on Nexus Mods so users can download only the build they need.
-3. **Colorful-Rivals-All-Platforms** is a convenience archive containing every configurator build in separate folders.
 
 The compiled configurator includes Python, its graphical interface, the asset template, and the correct [retoc](https://github.com/trumank/retoc) 0.1.5 executable for its platform. Users do not need to install Python, Tkinter, retoc, a command-line shell, or any other dependency.
 
@@ -104,7 +103,6 @@ The **Build release** workflow runs only through GitHub's **Run workflow** butto
 Every successful run produces:
 
 - five platform archives: Windows x64, Linux x64, Linux ARM64, macOS Intel, and macOS Apple Silicon;
-- `Colorful-Rivals-All-Platforms`, with those applications arranged in platform folders as a convenience download;
 - `Colorful-Rivals-Vibrant-Preset`, containing the ready-made `.pak`, `.ucas`, and `.utoc` files for the primary Nexus Mods download.
 
 ## Credits and licenses
