@@ -1,0 +1,144 @@
+name: Build release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version without the leading v, for example 0.1.0
+        required: true
+        type: string
+      release_mode:
+        description: Build artifacts only, or also create a GitHub release
+        required: true
+        default: artifacts-only
+        type: choice
+        options:
+          - artifacts-only
+          - draft
+          - prerelease
+          - release
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Validate version
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          version = os.environ['RELEASE_VERSION']
+          if not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?', version):
+              raise SystemExit(f'Invalid release version: {version!r}')
+          PY
+
+  build:
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-x86_64
+            runner: windows-2025
+            retoc: windows-x86_64
+            retoc_path: vendor/retoc/retoc.exe
+            app_name: Colorful Rivals
+            payload: dist/Colorful Rivals.exe
+          - platform: linux-x86_64
+            runner: ubuntu-24.04
+            retoc: linux-x86_64
+            retoc_path: vendor/retoc/retoc
+            app_name: colorful-rivals
+            payload: dist/colorful-rivals
+          - platform: linux-aarch64
+            runner: ubuntu-24.04-arm
+            retoc: linux-aarch64
+            retoc_path: vendor/retoc/retoc
+            app_name: colorful-rivals
+            payload: dist/colorful-rivals
+          - platform: macos-x86_64
+            runner: macos-15-intel
+            retoc: macos-x86_64
+            retoc_path: vendor/retoc/retoc
+            app_name: Colorful Rivals
+            payload: dist/Colorful Rivals.app
+          - platform: macos-aarch64
+            runner: macos-15
+            retoc: macos-aarch64
+            retoc_path: vendor/retoc/retoc
+            app_name: Colorful Rivals
+            payload: dist/Colorful Rivals.app
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+          cache: pip
+      - name: Install build tools
+        run: python -m pip install -r requirements-build.txt
+      - name: Verify source
+        run: python -m unittest discover -p "test*.py"
+      - name: Fetch licensed components
+        run: |
+          python scripts/fetch_retoc.py --platform "${{ matrix.retoc }}" --output vendor/retoc
+          python scripts/fetch_runtime_licenses.py
+      - name: Build executable
+        env:
+          RETOC_BINARY: ${{ github.workspace }}/${{ matrix.retoc_path }}
+          COLORFUL_RIVALS_APP_NAME: ${{ matrix.app_name }}
+        run: pyinstaller --noconfirm --clean "Colorful Rivals.spec"
+      - name: Exercise packaged application
+        run: python scripts/smoke_test_release.py --payload "${{ matrix.payload }}"
+      - name: Package platform release
+        run: python scripts/package_release.py --platform "${{ matrix.platform }}" --payload "${{ matrix.payload }}" --output release-assets --version "${{ inputs.version }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: platform-${{ matrix.platform }}
+          path: release-assets/*.zip
+          if-no-files-found: error
+
+  assemble:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: platform-*
+          path: platform-assets
+          merge-multiple: true
+      - name: Fetch release license texts
+        run: python3 scripts/fetch_runtime_licenses.py
+      - name: Assemble downloads
+        run: |
+          python3 scripts/package_release.py --combine platform-assets --output release-assets --version "${{ inputs.version }}"
+          python3 scripts/package_release.py --presets --output release-assets --version "${{ inputs.version }}"
+          cp platform-assets/*.zip release-assets/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Colorful-Rivals-${{ inputs.version }}
+          path: release-assets/*.zip
+          if-no-files-found: error
+
+      - name: Create GitHub release
+        if: inputs.release_mode != 'artifacts-only'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_MODE: ${{ inputs.release_mode }}
+        run: |
+          options=()
+          if [[ "$RELEASE_MODE" == "draft" ]]; then options+=(--draft); fi
+          if [[ "$RELEASE_MODE" == "prerelease" ]]; then options+=(--prerelease); fi
+          gh release create "v$RELEASE_VERSION" release-assets/*.zip \
+            --target "$GITHUB_SHA" \
+            --title "Colorful Rivals v$RELEASE_VERSION" \
+            --generate-notes \
+            "${options[@]}"

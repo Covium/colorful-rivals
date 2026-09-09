@@ -1,0 +1,15 @@
+{
+  "chunk_paths": {
+    "7ea416f57f8f0c5500000001": "../../../TokyoXtremeRacer/Content/ITSB/UI/Font/Styles/STL_InGame_RivalMark_Unknown_Rumer.uasset",
+    "a4f0b956f1ad82fc00000001": "../../../TokyoXtremeRacer/Content/ITSB/UI/Font/Styles/STL_InGame_RivalMark_Complete.uasset",
+    "7655b268a4b1908d00000001": "../../../TokyoXtremeRacer/Content/ITSB/UI/Font/Styles/STL_InGame_RivalMark_Incomplete.uasset",
+    "622984acb0c2e4c100000001": "../../../TokyoXtremeRacer/Content/ITSB/UI/Font/Styles/STL_InGame_RivalMark_None.uasset",
+    "54373db31f821a3c00000001": "../../../TokyoXtremeRacer/Content/ITSB/UI/InGame/MiniMap/Textures/T_InGame_MiniMap_Icon_Set.uasset",
+    "a4c456c9d38e807400000001": "../../../TokyoXtremeRacer/Content/ITSB/UI/Font/Styles/STL_InGame_RivalMark_Encount.uasset",
+    "d03e891f49f5781a00000001": "../../../TokyoXtremeRacer/Content/ITSB/UI/OutGame/Map/Textures/T_OutGame_Map_RIval_Icon_Set.uasset",
+    "99b6844ce21e196900000001": "../../../TokyoXtremeRacer/Content/ITSB/UI/Font/Styles/STL_InGame_RivalMark_Unknown_None.uasset",
+    "9fc0f9f75e9106d700000001": "../../../TokyoXtremeRacer/Content/ITSB/UI/InGame/Common/Widgets/WBP_InGame_Rivalmark.uasset"
+  },
+  "version": "ReplaceIoChunkHashWithIoHash",
+  "mount_point": "../../../"
+}

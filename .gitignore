@@ -1,0 +1,12 @@
+Colorful Rivals Data/
+Release/
+build/
+dist/
+vendor/retoc/
+licenses/Python.txt
+licenses/PyInstaller.txt
+licenses/Tcl.txt
+licenses/Tk.txt
+__pycache__/
+*.py[cod]
+*.spec.bak

@@ -1,0 +1,30 @@
+{
+  "version": "0.1.5",
+  "platforms": {
+    "windows-x86_64": {
+      "asset": "retoc_cli-x86_64-pc-windows-msvc.zip",
+      "sha256": "cc036b06ad3bdcf7003690b00d82719980c374e48a95bf0654f9959148d263aa",
+      "executable": "retoc.exe"
+    },
+    "linux-x86_64": {
+      "asset": "retoc_cli-x86_64-unknown-linux-gnu.tar.xz",
+      "sha256": "3c309a4aea0c6d0a5c6ee31b1d1b32768eb86ac67e3a1890d677eabe6ce26b36",
+      "executable": "retoc"
+    },
+    "linux-aarch64": {
+      "asset": "retoc_cli-aarch64-unknown-linux-gnu.tar.xz",
+      "sha256": "a2dfe8e8f89963953c8e71fe54fda8871a994150ed6ebf5e3496fd663aaddda4",
+      "executable": "retoc"
+    },
+    "macos-x86_64": {
+      "asset": "retoc_cli-x86_64-apple-darwin.tar.xz",
+      "sha256": "d75b050499b6eda1687c4a577cdb5482718d1f526677d7f47f3ac8dd067c5fc3",
+      "executable": "retoc"
+    },
+    "macos-aarch64": {
+      "asset": "retoc_cli-aarch64-apple-darwin.tar.xz",
+      "sha256": "07d490455012c4851a20df07380fe3bf470ed49f20c465a8af327328e735b935",
+      "executable": "retoc"
+    }
+  }
+}

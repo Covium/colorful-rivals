@@ -1,0 +1,9 @@
+{
+  "colors": {
+    "player": "#FF6D00",
+    "none": "#2979FF",
+    "incomplete": "#FFD600",
+    "complete": "#00C853",
+    "encount": "#FF1744"
+  }
+}

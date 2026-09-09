@@ -1,0 +1,360 @@
+{
+  "styles": {
+    "unknown_rumer": {
+      "chunk": "7ea416f57f8f0c5500000001",
+      "offset": 832,
+      "original": "#FDB905"
+    },
+    "complete": {
+      "chunk": "a4f0b956f1ad82fc00000001",
+      "offset": 824,
+      "original": "#37DC78"
+    },
+    "incomplete": {
+      "chunk": "7655b268a4b1908d00000001",
+      "offset": 824,
+      "original": "#FFE66E"
+    },
+    "none": {
+      "chunk": "622984acb0c2e4c100000001",
+      "offset": 808,
+      "original": "#378CFF"
+    },
+    "encount": {
+      "chunk": "a4c456c9d38e807400000001",
+      "offset": 816,
+      "original": "#FF4146"
+    },
+    "unknown_none": {
+      "chunk": "99b6844ce21e196900000001",
+      "offset": 832,
+      "original": "#F0EEF0"
+    }
+  },
+  "widget": {
+    "chunk": "9fc0f9f75e9106d700000001",
+    "tracks": [
+      {
+        "state": "complete",
+        "offsets": [
+          [
+            67048,
+            0
+          ],
+          [
+            67076,
+            0
+          ],
+          [
+            67150,
+            1
+          ],
+          [
+            67178,
+            1
+          ],
+          [
+            67252,
+            2
+          ],
+          [
+            67280,
+            2
+          ]
+        ]
+      },
+      {
+        "state": "complete",
+        "offsets": [
+          [
+            67504,
+            0
+          ],
+          [
+            67532,
+            0
+          ],
+          [
+            67606,
+            1
+          ],
+          [
+            67634,
+            1
+          ],
+          [
+            67708,
+            2
+          ],
+          [
+            67736,
+            2
+          ]
+        ]
+      },
+      {
+        "state": "encount",
+        "offsets": [
+          [
+            67960,
+            0
+          ],
+          [
+            67988,
+            0
+          ],
+          [
+            68062,
+            1
+          ],
+          [
+            68090,
+            1
+          ],
+          [
+            68164,
+            2
+          ],
+          [
+            68192,
+            2
+          ]
+        ]
+      },
+      {
+        "state": "encount",
+        "offsets": [
+          [
+            68416,
+            0
+          ],
+          [
+            68444,
+            0
+          ],
+          [
+            68518,
+            1
+          ],
+          [
+            68546,
+            1
+          ],
+          [
+            68620,
+            2
+          ],
+          [
+            68648,
+            2
+          ]
+        ]
+      },
+      {
+        "state": "incomplete",
+        "offsets": [
+          [
+            68872,
+            0
+          ],
+          [
+            68900,
+            0
+          ],
+          [
+            68974,
+            1
+          ],
+          [
+            69002,
+            1
+          ],
+          [
+            69076,
+            2
+          ],
+          [
+            69104,
+            2
+          ]
+        ]
+      },
+      {
+        "state": "incomplete",
+        "offsets": [
+          [
+            69328,
+            0
+          ],
+          [
+            69356,
+            0
+          ],
+          [
+            69430,
+            1
+          ],
+          [
+            69458,
+            1
+          ],
+          [
+            69532,
+            2
+          ],
+          [
+            69560,
+            2
+          ]
+        ]
+      },
+      {
+        "state": "none",
+        "offsets": [
+          [
+            69784,
+            0
+          ],
+          [
+            69812,
+            0
+          ],
+          [
+            69886,
+            1
+          ],
+          [
+            69914,
+            1
+          ],
+          [
+            69988,
+            2
+          ],
+          [
+            70016,
+            2
+          ]
+        ]
+      },
+      {
+        "state": "none",
+        "offsets": [
+          [
+            70240,
+            0
+          ],
+          [
+            70268,
+            0
+          ],
+          [
+            70342,
+            1
+          ],
+          [
+            70370,
+            1
+          ],
+          [
+            70444,
+            2
+          ],
+          [
+            70472,
+            2
+          ]
+        ]
+      },
+      {
+        "state": "unknown_none",
+        "offsets": [
+          [
+            70696,
+            0
+          ],
+          [
+            70724,
+            0
+          ],
+          [
+            70798,
+            1
+          ],
+          [
+            70826,
+            1
+          ],
+          [
+            70900,
+            2
+          ],
+          [
+            70928,
+            2
+          ]
+        ]
+      },
+      {
+        "state": "unknown_rumer",
+        "offsets": [
+          [
+            71152,
+            0
+          ],
+          [
+            71180,
+            0
+          ],
+          [
+            71254,
+            1
+          ],
+          [
+            71282,
+            1
+          ],
+          [
+            71356,
+            2
+          ],
+          [
+            71384,
+            2
+          ]
+        ]
+      }
+    ]
+  },
+  "textures": [
+    {
+      "chunk": "54373db31f821a3c00000001",
+      "name": "T_InGame_MiniMap_Icon_Set",
+      "width": 448,
+      "height": 80,
+      "offset": 518,
+      "size": 35840
+    },
+    {
+      "chunk": "d03e891f49f5781a00000001",
+      "name": "T_OutGame_Map_RIval_Icon_Set",
+      "width": 728,
+      "height": 128,
+      "offset": 526,
+      "size": 93184
+    }
+  ],
+  "hashes": {
+    "manifest.json": "fcac5e95280a603f24293a6ca6e22acdfe4c6fde18b6445bbd63f3bf601d8599",
+    "chunks/54373db31f821a3c00000001": "3842fea2a34e8e1858ef517201fc6e7e006096204ae169337ba4e7dc0756e21c",
+    "chunks/622984acb0c2e4c100000001": "9e23544f6029e6faa5760e1eb43ef271a6f387b510960ba1d51be3ec4d84603d",
+    "chunks/7655b268a4b1908d00000001": "de54cdc92adebfc0b2999f9a759581507f22fae24ef65a26b02bb3911a8e465e",
+    "chunks/7ea416f57f8f0c5500000001": "65a5c11370706f2d221932c7630b7ad39cb6bb27c44d7ef20135a73f94b2c309",
+    "chunks/99b6844ce21e196900000001": "8514ad58682046d5b3fa45c34e4f0c3c352cdff285e51ddefe20f4f8402efccc",
+    "chunks/9fc0f9f75e9106d700000001": "94bb9236a82b196fda90b7a8024d9ea34b672b720fd6c4f7973b18e078116ef1",
+    "chunks/a18689456ca1539200000006": "0ee08ed2fa1abb0eb0190eb672e04bc6c0f861bbc9ea95d61a4e7f34147ac88c",
+    "chunks/a4c456c9d38e807400000001": "65b62bf655dd65023541c477dbdab6ebb7dcee18e999a005b3b021356abedf09",
+    "chunks/a4f0b956f1ad82fc00000001": "30ea86ceb44e5b45476f3201e56daf25e90ae5ec70b527c6c3c5aace1d00eb85",
+    "chunks/d03e891f49f5781a00000001": "0b97e1847316eb4bd97f25cd886a40b6429a87271a6919ea1922384e23bdc4f6"
+  }
+}
