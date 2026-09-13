@@ -14,30 +14,33 @@ The game's white `Unknown_None` marker and its second atlas column do not appear
 
 GitHub releases provide these downloads:
 
-1. **Colorful-Rivals-Vibrant-Preset** contains a ready-made mod. It does not contain or run a program.
+1. **Colorful-Rivals-Vibrant-Preset** contains all six ready-made presets in separate folders. It does not contain or run a program. The archive keeps its existing name for release compatibility.
 2. Five platform-specific archives contain the configurator for Windows x64, Linux x64, Linux ARM64, macOS Intel, and macOS Apple Silicon. These archives are intended to be listed separately on Nexus Mods so users can download only the build they need.
 
 The compiled configurator includes Python, its graphical interface, the asset template, and the correct [retoc](https://github.com/trumank/retoc) 0.1.5 executable for its platform. Users do not need to install Python, Tkinter, retoc, a command-line shell, or any other dependency.
 
 The executables are currently unsigned. Windows SmartScreen or macOS Gatekeeper may therefore ask you to confirm that you want to run a downloaded build. Release archives include the source repository's documentation and third-party license texts so the build can be audited.
 
-## Ready-made vibrant preset
+## Ready-made presets
 
-The included preset uses a more saturated version of the game's familiar orange, blue, yellow, green, and red scheme:
+Choose one of these folders. The same presets are available in the application:
 
-- Player: `#FF6D00`
-- Not raced yet: `#2979FF`
-- Raced, not won: `#FFD600`
-- Defeated: `#00C853`
-- Currently racing: `#FF1744`
+- **Vibrant - Brighter colors** — more saturated versions of the game's familiar colors; the default.
+- **Blue & Gold - Protanomaly and deuteranomaly**
+- **Blue & Gold - Stronger separation, protanopia and deuteranopia**
+- **Coral & Cyan - Tritanomaly**
+- **Coral & Cyan - Stronger separation, tritanopia**
+- **Grayscale - Experimental, monochromacy**
 
-Close the game and place all three `RivalColors_Config_P` files (`.pak`, `.ucas`, and `.utoc`) in:
+The intended-use names describe proposed starting points, not validated accessibility guarantees. Try them in the game and adjust them to your vision and display. Grayscale relies entirely on brightness differences; darker markers may be harder to see against dark scenery.
+
+Close the game and place all three `RivalColors_Config_P` files (`.pak`, `.ucas`, and `.utoc`) from **one** preset folder in:
 
 ```text
 TokyoXtremeRacer/TokyoXtremeRacer/Content/Paks/~mods
 ```
 
-Create `~mods` if it does not exist. Remove older `RivalColors*` files before launching the game, and keep the three new files together.
+Create `~mods` if it does not exist. Remove older `RivalColors*` files before launching the game, and keep the three new files together. All presets use the same filenames: install only one palette at a time.
 
 ## Custom colors
 
@@ -50,6 +53,10 @@ Extract the archive for your platform and open the application:
 Linux normally retains the executable permission when extracted. If your archive program removes it, run `chmod +x colorful-rivals` once.
 
 The configurator attempts to locate Tokyo Xtreme Racer in your Steam libraries. If it cannot find the game, select its installation folder. Choose a color for each state, close the game, and select **Build and install**. Restart the game afterwards.
+
+The **Preset** menu starts with **Vibrant** on a fresh installation. Existing saved colors are restored. Selecting a preset fills all five fields. Manual changes switch the menu to **Custom**, or to the matching preset when all five colors match it. Selecting **Custom** clears every field so the original game colors are used.
+
+The square before each HEX field previews its color; an empty field previews the game's original color. An incomplete or invalid HEX value shows a crossed square until corrected.
 
 **Build only** creates the package without changing the game. **Original** leaves that state's exact original data in place. **Save settings** records the colors and game location without building.
 
@@ -70,6 +77,14 @@ Run the tests:
 ```sh
 python -m unittest discover -p "test*.py"
 ```
+
+After making changes to `palettes.py`, regenerate the ready-made packages with the bundled or fetched retoc available:
+
+```sh
+python scripts/build_presets.py
+```
+
+This uses the application's verified builder for every palette and writes the three installable files into each named `presets` folder. The release archive includes all of those folders.
 
 Install the pinned build tool, fetch the pinned retoc executable for your platform, collect the runtime licenses, and build:
 
