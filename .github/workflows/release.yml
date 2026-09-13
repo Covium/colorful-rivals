@@ -179,7 +179,7 @@ jobs:
       matrix:
         include:
           - file_id: '7935681'
-            archive: Vibrant-Preset
+            archive: Presets
             name: Colorful Rivals Presets
             category: main
             presets: true

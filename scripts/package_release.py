@@ -81,7 +81,7 @@ def combined_archive(input_dir, output, version):
 
 
 def presets_archive(output, version):
-    destination = output / f'Colorful-Rivals-Vibrant-Preset-{version}.zip'
+    destination = output / f'Colorful-Rivals-Presets-{version}.zip'
     with zipfile.ZipFile(destination, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         add_tree(archive, ROOT / 'presets')
     print(destination)

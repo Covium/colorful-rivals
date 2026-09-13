@@ -14,7 +14,7 @@ The game's white `Unknown_None` marker and its second atlas column do not appear
 
 GitHub releases provide these downloads:
 
-1. **Colorful-Rivals-Vibrant-Preset** contains all six ready-made presets in separate folders. It does not contain or run a program. The archive keeps its existing name for release compatibility.
+1. **Colorful-Rivals-Presets** contains all six ready-made presets in separate folders. It does not contain or run a program.
 2. Five platform-specific archives contain the configurator for Windows x64, Linux x64, Linux ARM64, macOS Intel, and macOS Apple Silicon. These archives are intended to be listed separately on Nexus Mods so users can download only the build they need.
 
 The compiled configurator includes Python, its graphical interface, the asset template, and the correct [retoc](https://github.com/trumank/retoc) 0.1.5 executable for its platform. Users do not need to install Python, Tkinter, retoc, a command-line shell, or any other dependency.
@@ -118,7 +118,7 @@ The **Build release** workflow runs only through GitHub's **Run workflow** butto
 Every successful run produces:
 
 - five platform archives: Windows x64, Linux x64, Linux ARM64, macOS Intel, and macOS Apple Silicon;
-- `Colorful-Rivals-Vibrant-Preset`, containing the ready-made `.pak`, `.ucas`, and `.utoc` files for the primary Nexus Mods download.
+- `Colorful-Rivals-Presets`, containing the ready-made `.pak`, `.ucas`, and `.utoc` files for the primary Nexus Mods download.
 
 ## Nexus Mods publishing
 
@@ -133,7 +133,7 @@ Releases created outside this workflow are not automatically uploaded to Nexus.
 
 Each Nexus upload uses the exact archive from the matching GitHub release and its
 version without the `v` prefix. The preset listing becomes **Colorful Rivals Presets**;
-the GitHub ZIP name remains `Colorful-Rivals-Vibrant-Preset-<version>.zip` and includes
+the GitHub ZIP is named `Colorful-Rivals-Presets-<version>.zip` and includes
 the entire `presets` directory. Presets and Windows are main files; Linux and macOS
 are optional files. Successful updates archive the corresponding previous version.
 The numeric file IDs in the workflow identify the six existing listings; the short
