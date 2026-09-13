@@ -105,6 +105,36 @@ Every successful run produces:
 - five platform archives: Windows x64, Linux x64, Linux ARM64, macOS Intel, and macOS Apple Silicon;
 - `Colorful-Rivals-Vibrant-Preset`, containing the ready-made `.pak`, `.ucas`, and `.utoc` files for the primary Nexus Mods download.
 
+## Nexus Mods publishing
+
+Before publishing a normal release, add a repository **Actions secret** named
+`NEXUS_API_KEY` under **Settings → Secrets and variables → Actions → New repository secret**.
+Paste your Nexus API key into its value. Do not use a plain repository variable or commit the key.
+
+The manual **Build release** workflow uploads to Nexus after successfully creating
+a normal GitHub release (`release` mode). Drafts, prereleases, and artifacts-only
+runs do not publish to Nexus. A missing key stops a normal release before building.
+Releases created outside this workflow are not automatically uploaded to Nexus.
+
+Each Nexus upload uses the exact archive from the matching GitHub release and its
+version without the `v` prefix. The preset listing becomes **Colorful Rivals Presets**;
+the GitHub ZIP name remains `Colorful-Rivals-Vibrant-Preset-<version>.zip` and includes
+the entire `presets` directory. Presets and Windows are main files; Linux and macOS
+are optional files. Successful updates archive the corresponding previous version.
+The numeric file IDs in the workflow identify the six existing listings; the short
+unique IDs are not needed by the upload action.
+
+The optional **changelog** workflow input supplies release notes for both sites.
+If omitted, GitHub generates the notes from commits. The preset upload adds those
+notes to mod `31159987732670` once and updates the mod's displayed version.
+The official Nexus upload action is pinned to a revision with changelog support.
+
+Uploads are individual operations, so a Nexus failure can leave some files updated
+and others unchanged while the GitHub release remains available. Inspect each Nexus
+job's log and summary before retrying; rerunning a successful upload can create a
+duplicate version. If a job fails after creating the file version but while posting
+the changelog, repair the changelog separately rather than uploading that file again.
+
 ## Credits and licenses
 
 Colorful Rivals embeds retoc under its MIT License and includes all required runtime license texts in release archives. FModel, UE4SS, UAssetGUI/UAssetAPI, and Pillow were used while locating, inspecting, modifying, and checking the game assets. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for authors, links, licenses, and the complete tool credits.

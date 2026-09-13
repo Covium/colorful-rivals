@@ -7,6 +7,10 @@ on:
         description: Version without the leading v, for example 0.1.0
         required: true
         type: string
+      changelog:
+        description: Release notes for GitHub and Nexus (leave empty to generate from commits)
+        required: false
+        type: string
       release_mode:
         description: Build artifacts only, or also create a GitHub release
         required: true
@@ -21,10 +25,23 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: colorful-rivals-release
+  cancel-in-progress: false
+
 jobs:
   validate:
     runs-on: ubuntu-24.04
     steps:
+      - name: Check Nexus publishing credentials
+        if: inputs.release_mode == 'release'
+        env:
+          NEXUS_API_KEY: ${{ secrets.NEXUS_API_KEY }}
+        run: |
+          if [ -z "$NEXUS_API_KEY" ]; then
+            echo '::error::Set the NEXUS_API_KEY repository Actions secret before publishing a release.'
+            exit 1
+          fi
       - name: Validate version
         env:
           RELEASE_VERSION: ${{ inputs.version }}
@@ -133,12 +150,103 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_VERSION: ${{ inputs.version }}
           RELEASE_MODE: ${{ inputs.release_mode }}
+          RELEASE_CHANGELOG: ${{ inputs.changelog }}
         run: |
           options=()
+          if [[ -n "$RELEASE_CHANGELOG" ]]; then
+            printf '%s\n' "$RELEASE_CHANGELOG" > release-notes.md
+            options+=(--notes-file release-notes.md)
+          else
+            options+=(--generate-notes)
+          fi
           if [[ "$RELEASE_MODE" == "draft" ]]; then options+=(--draft); fi
           if [[ "$RELEASE_MODE" == "prerelease" ]]; then options+=(--prerelease); fi
           gh release create "v$RELEASE_VERSION" release-assets/*.zip \
             --target "$GITHUB_SHA" \
             --title "Colorful Rivals v$RELEASE_VERSION" \
-            --generate-notes \
             "${options[@]}"
+
+  nexus:
+    name: Nexus / ${{ matrix.name }}
+    needs: assemble
+    if: inputs.release_mode == 'release'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        include:
+          - file_id: '7935681'
+            archive: Vibrant-Preset
+            name: Colorful Rivals Presets
+            category: main
+            presets: true
+          - file_id: '7935699'
+            archive: windows-x86_64
+            name: Windows x64 - Colorful Rivals Configurator
+            category: main
+            presets: false
+          - file_id: '7935705'
+            archive: linux-x86_64
+            name: Linux x64 - Colorful Rivals Configurator
+            category: optional
+            presets: false
+          - file_id: '7935708'
+            archive: linux-aarch64
+            name: Linux ARM64 - Colorful Rivals Configurator
+            category: optional
+            presets: false
+          - file_id: '7935711'
+            archive: macos-x86_64
+            name: macOS Intel - Colorful Rivals Configurator
+            category: optional
+            presets: false
+          - file_id: '7935720'
+            archive: macos-aarch64
+            name: macOS Apple Silicon - Colorful Rivals
+            category: optional
+            presets: false
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RELEASE_VERSION: ${{ inputs.version }}
+      ARCHIVE: Colorful-Rivals-${{ matrix.archive }}-${{ inputs.version }}.zip
+    steps:
+      - name: Download the published release file and notes
+        id: release
+        shell: bash
+        run: |
+          gh release download "v$RELEASE_VERSION" --pattern "$ARCHIVE" --dir release-assets
+          gh release view "v$RELEASE_VERSION" --json body --jq .body > release-notes.md
+          python3 - <<'PY'
+          import os
+          import uuid
+          from pathlib import Path
+          delimiter = uuid.uuid4().hex
+          notes = Path('release-notes.md').read_text()
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f'changelog<<{delimiter}\n{notes}\n{delimiter}\n')
+          PY
+      # Pinned official action revision includes changelog support absent in beta.9.
+      - name: Publish file version and archive previous version
+        id: upload
+        uses: Nexus-Mods/upload-action@98532f7670c27cbecc78fae03fa3e278147827e2
+        with:
+          api_key: ${{ secrets.NEXUS_API_KEY }}
+          file_id: ${{ matrix.file_id }}
+          filename: release-assets/${{ env.ARCHIVE }}
+          version: ${{ inputs.version }}
+          display_name: ${{ matrix.name }}
+          category: ${{ matrix.category }}
+          description: ${{ matrix.presets && 'Close Tokyo Xtreme Racer, choose a preset, then copy its .pak, .ucas, and .utoc files into <GAME_LOCATION>/TokyoXtremeRacer/Content/Paks/~mods. Create the ~mods folder if it doesn''t exist.' || 'Run, pick colors, provide game''s path, press Build and install.' }}
+          archive_existing_version: 'true'
+          update_mod_version: ${{ matrix.presets }}
+          mod_id: '31159987732670'
+          changelog: ${{ matrix.presets && steps.release.outputs.changelog || '' }}
+      - name: Record published version
+        env:
+          FILE_ID: ${{ matrix.file_id }}
+          VERSION_ID: ${{ steps.upload.outputs.version_id }}
+        run: printf 'Nexus file %s → version %s (%s)\n' "$FILE_ID" "$VERSION_ID" "$RELEASE_VERSION" >> "$GITHUB_STEP_SUMMARY"
