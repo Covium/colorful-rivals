@@ -213,7 +213,7 @@ class App:
         selector_frame.grid(row=2, column=1, columnspan=3, sticky='ew', pady=(0, 12))
         self.preset_selector = ttk.Combobox(
             selector_frame, textvariable=self.preset, values=(*PRESETS, 'Custom'),
-            state='readonly', style='Flat.TCombobox')
+            state='readonly', style='Flat.TCombobox', cursor='hand2')
         self.preset_selector.place(x=0, y=0, relwidth=1, height=CONTROL_HEIGHT)
         self.preset_selector.bind('<<ComboboxSelected>>', self.select_preset)
         for row, key in enumerate(ORDER, 3):
@@ -318,9 +318,9 @@ class App:
         if 'FlatSelector.field' not in style.element_names():
             self.root.selector_images = self.selector_images
             style.element_create('FlatSelector.field', 'image', field,
-                                 ('active', active_field), border=0, sticky='nswe')
+                                 ('hover', active_field), ('active', active_field), border=0, sticky='nswe')
             style.element_create('FlatSelector.downarrow', 'image', arrow,
-                                 ('active', active_arrow), border=0, sticky='ns')
+                                 ('hover', active_arrow), ('active', active_arrow), border=0, sticky='ns')
         else:
             self.selector_images = self.root.selector_images
         style.layout('Flat.TCombobox', [('FlatSelector.field', {'sticky': 'nswe', 'children': [
@@ -331,9 +331,9 @@ class App:
         style.configure('TCombobox', fieldbackground=CONTROL, background=CONTROL,
                         foreground=CONTROL_TEXT, arrowcolor=CONTROL_TEXT,
                         borderwidth=0, padding=6)
-        style.map('TCombobox', fieldbackground=[('active', ACCENT), ('readonly', CONTROL)],
-                  background=[('active', ACCENT)], foreground=[('readonly', CONTROL_TEXT)],
-                  selectbackground=[('readonly', CONTROL)],
+        style.map('TCombobox', fieldbackground=[('hover', ACCENT), ('active', ACCENT), ('readonly', CONTROL)],
+                  background=[('hover', ACCENT), ('active', ACCENT)], foreground=[('readonly', CONTROL_TEXT)],
+                  selectbackground=[('hover', ACCENT), ('active', ACCENT), ('readonly', CONTROL)],
                   selectforeground=[('readonly', CONTROL_TEXT)],
                   bordercolor=[('!disabled', BACKGROUND)],
                   lightcolor=[('!disabled', BACKGROUND)], darkcolor=[('!disabled', BACKGROUND)])
@@ -341,6 +341,7 @@ class App:
         self.root.option_add('*TCombobox*Listbox.foreground', CONTROL_TEXT)
         self.root.option_add('*TCombobox*Listbox.selectBackground', ACCENT)
         self.root.option_add('*TCombobox*Listbox.selectForeground', CONTROL_TEXT)
+        self.root.option_add('*TCombobox*Listbox.cursor', 'hand2')
         style.configure('TFrame', background=BACKGROUND)
         style.configure('TLabel', background=BACKGROUND, foreground=FOREGROUND)
         style.configure('Header.TLabel', background=BACKGROUND, foreground=ACCENT)
