@@ -21,6 +21,7 @@ FOREGROUND = '#FFFFFF'
 CONTROL = '#CCC9CD'
 ACCENT = '#E76238'
 CONTROL_TEXT = '#000000'
+CONTROL_HEIGHT = 29
 LABELS = {
     'player': 'Player',
     'none': 'Not raced yet',
@@ -49,7 +50,7 @@ class FlatButton(tk.Canvas):
         self.hovered = False
         self.pressed = False
         width = font.measure(text) + 22
-        height = font.metrics('linespace') + 14
+        height = CONTROL_HEIGHT
         super().__init__(parent, width=width, height=height, background=BACKGROUND,
                          highlightthickness=0, borderwidth=0, relief='flat',
                          cursor='hand2', takefocus=True)
@@ -156,7 +157,7 @@ class FlatEntry(FlatField):
                             selectforeground=CONTROL_TEXT, font=font)
 
         super().__init__(parent, make_entry, max(140, font.measure('0') * width + 14),
-                         font.metrics('linespace') + 14)
+                         CONTROL_HEIGHT)
 
 
 class FlatText(FlatField):
@@ -202,16 +203,18 @@ class App:
         ttk.Label(frame, text='Tokyo Xtreme Racer | Colorful Rivals',
                   font=('', 15, 'bold'), style='Header.TLabel').grid(
                       row=0, column=0, columnspan=4, sticky='w')
-        ttk.Label(frame, text='Choose a color, or leave its field empty to keep the original.').grid(row=1, column=0, columnspan=4, sticky='w', pady=(8, 12))
+        ttk.Label(frame, text='Choose a color, or leave its field empty to keep the original.').grid(row=1, column=0, columnspan=4, sticky='w', pady=(6, 12))
         build.ensure_data_files()
         config = build.read_config(build.DATA_ROOT / 'colors.json')
         settings = build.read_settings()
         self.preset = tk.StringVar()
-        ttk.Label(frame, text='Preset').grid(row=2, column=0, sticky='w')
+        ttk.Label(frame, text='Preset').grid(row=2, column=0, sticky='w', pady=(0, 12))
+        selector_frame = ttk.Frame(frame, height=CONTROL_HEIGHT)
+        selector_frame.grid(row=2, column=1, columnspan=3, sticky='ew', pady=(0, 12))
         self.preset_selector = ttk.Combobox(
-            frame, textvariable=self.preset, values=(*PRESETS, 'Custom'),
-            state='readonly', width=66)
-        self.preset_selector.grid(row=2, column=1, columnspan=3, sticky='ew', pady=(0, 10))
+            selector_frame, textvariable=self.preset, values=(*PRESETS, 'Custom'),
+            state='readonly', style='Flat.TCombobox')
+        self.preset_selector.place(x=0, y=0, relwidth=1, height=CONTROL_HEIGHT)
         self.preset_selector.bind('<<ComboboxSelected>>', self.select_preset)
         for row, key in enumerate(ORDER, 3):
             variable = tk.StringVar(value=config['colors'][key] or '')
@@ -219,40 +222,40 @@ class App:
             ttk.Label(frame, text=LABELS[key]).grid(row=row, column=0, sticky='w', padx=(0, 14))
             field = ttk.Frame(frame)
             field.grid(row=row, column=1, sticky='ew', pady=3)
-            swatch = tk.Canvas(field, width=20, height=20, highlightthickness=0,
+            swatch = tk.Canvas(field, width=CONTROL_HEIGHT, height=CONTROL_HEIGHT, highlightthickness=0,
                                borderwidth=0, background=BACKGROUND)
-            swatch.pack(side='left', padx=(0, 8))
+            swatch.pack(side='left', padx=(0, 6))
             self.swatches[key] = swatch
             entry = FlatEntry(field, variable, width=20)
             entry.pack(side='left', fill='x', expand=True)
             FlatButton(frame, text='Choose…', command=lambda k=key: self.pick(k)).grid(
-                row=row, column=2, padx=6)
+                row=row, column=2, padx=6, sticky='ew')
             FlatButton(frame, text='Original', command=lambda v=variable: v.set('')).grid(
-                row=row, column=3)
+                row=row, column=3, sticky='ew')
         for variable in self.colors.values():
             variable.trace_add('write', self.colors_changed)
         self.colors_changed()
         self.game = tk.StringVar(value=settings['game_path'] or '')
-        ttk.Label(frame, text='Game folder').grid(row=8, column=0, sticky='w', pady=(18, 4))
+        ttk.Label(frame, text='Game folder').grid(row=8, column=0, sticky='w', pady=(12, 0))
         game_entry = FlatEntry(frame, self.game)
         game_entry.grid(row=8, column=1, columnspan=2, sticky='ew',
-                        padx=(0, 6), pady=(18, 4))
+                        padx=(0, 6), pady=(12, 0))
         FlatButton(frame, text='Browse…', command=self.browse_game).grid(
-            row=8, column=3, pady=(18, 4))
-        FlatButton(frame, text='Find game', command=self.detect).grid(row=9, column=3, pady=5)
+            row=8, column=3, pady=(12, 0), sticky='ew')
+        FlatButton(frame, text='Find game', command=self.detect).grid(row=9, column=3, pady=6, sticky='ew')
         ttk.Label(frame, text='Close Tokyo Xtreme Racer before installing.').grid(row=9, column=0, columnspan=3, sticky='w')
         buttons = ttk.Frame(frame)
-        buttons.grid(row=10, column=0, columnspan=4, sticky='ew', pady=12)
+        buttons.grid(row=10, column=0, columnspan=4, sticky='ew', pady=(6, 12))
         self.save_button = FlatButton(buttons, text='Save settings', command=self.save_clicked)
         self.save_button.pack(side='left')
         self.build_button = FlatButton(buttons, text='Build only', command=lambda: self.start(False))
-        self.build_button.pack(side='left', padx=8)
+        self.build_button.pack(side='left', padx=6)
         self.install_button = FlatButton(buttons, text='Build and install', command=lambda: self.start(True))
         self.install_button.pack(side='left')
         self.status = tk.StringVar(value='Ready')
         ttk.Label(frame, textvariable=self.status).grid(row=11, column=0, columnspan=4, sticky='w')
         self.log = FlatText(frame, rows=8, columns=70)
-        self.log.grid(row=12, column=0, columnspan=4, sticky='nsew', pady=(8, 0))
+        self.log.grid(row=12, column=0, columnspan=4, sticky='nsew', pady=(6, 0))
         frame.rowconfigure(12, weight=1)
         root.protocol('WM_DELETE_WINDOW', self.close)
         root.after(100, self.poll)
@@ -269,8 +272,8 @@ class App:
             swatch.delete('all')
             swatch.configure(background=color or CONTROL)
             if color is None:
-                swatch.create_line(3, 3, 17, 17, fill=CONTROL_TEXT, width=2)
-                swatch.create_line(3, 17, 17, 3, fill=CONTROL_TEXT, width=2)
+                swatch.create_line(6, 6, 23, 23, fill=CONTROL_TEXT, width=2)
+                swatch.create_line(6, 23, 23, 6, fill=CONTROL_TEXT, width=2)
 
     def select_preset(self, _event=None):
         palette = PRESETS.get(self.preset.get(), {})
@@ -298,6 +301,33 @@ class App:
         style = ttk.Style(self.root)
         if 'clam' in style.theme_names():
             style.theme_use('clam')
+        # Image elements avoid the theme's bevels and corner pixels. The field
+        # stretches edge to edge; the arrow shares its uninterrupted background.
+        self.selector_images = []
+        for color in (CONTROL, ACCENT):
+            # Tk tiles image elements rather than stretching them. A 1px tile
+            # causes thousands of drawing operations on each hover/menu redraw.
+            field = tk.PhotoImage(master=self.root, width=256, height=CONTROL_HEIGHT)
+            field.put(color, to=(0, 0, 256, CONTROL_HEIGHT))
+            arrow = tk.PhotoImage(master=self.root, width=29, height=29)
+            arrow.put(color, to=(0, 0, 29, 29))
+            for row in range(4):
+                arrow.put(CONTROL_TEXT, to=(10 + row, 12 + row, 19 - row, 13 + row))
+            self.selector_images.extend((field, arrow))
+        field, arrow, active_field, active_arrow = self.selector_images
+        if 'FlatSelector.field' not in style.element_names():
+            self.root.selector_images = self.selector_images
+            style.element_create('FlatSelector.field', 'image', field,
+                                 ('active', active_field), border=0, sticky='nswe')
+            style.element_create('FlatSelector.downarrow', 'image', arrow,
+                                 ('active', active_arrow), border=0, sticky='ns')
+        else:
+            self.selector_images = self.root.selector_images
+        style.layout('Flat.TCombobox', [('FlatSelector.field', {'sticky': 'nswe', 'children': [
+            ('FlatSelector.downarrow', {'side': 'right', 'sticky': 'ns'}),
+            ('Combobox.padding', {'sticky': 'nswe', 'children': [
+                ('Combobox.textarea', {'sticky': 'nswe'})]})]})])
+        style.configure('Flat.TCombobox', padding=(7, 0, 0, 0), borderwidth=0)
         style.configure('TCombobox', fieldbackground=CONTROL, background=CONTROL,
                         foreground=CONTROL_TEXT, arrowcolor=CONTROL_TEXT,
                         borderwidth=0, padding=6)
@@ -311,7 +341,7 @@ class App:
         self.root.option_add('*TCombobox*Listbox.foreground', CONTROL_TEXT)
         self.root.option_add('*TCombobox*Listbox.selectBackground', ACCENT)
         self.root.option_add('*TCombobox*Listbox.selectForeground', CONTROL_TEXT)
-        style.configure('TFrame' , background=BACKGROUND)
+        style.configure('TFrame', background=BACKGROUND)
         style.configure('TLabel', background=BACKGROUND, foreground=FOREGROUND)
         style.configure('Header.TLabel', background=BACKGROUND, foreground=ACCENT)
 
