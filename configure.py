@@ -13,6 +13,7 @@ except ImportError:
     raise SystemExit('Tkinter is unavailable in this source Python installation.')
 
 import build
+from palettes import ORDER, ORIGINAL, PRESETS, effective_color, matching_preset
 from paths import find_games, resolve_game, resolve_retoc
 
 BACKGROUND = '#000000'
@@ -20,7 +21,6 @@ FOREGROUND = '#FFFFFF'
 CONTROL = '#CCC9CD'
 ACCENT = '#E76238'
 CONTROL_TEXT = '#000000'
-ORDER = ['player', 'none', 'incomplete', 'complete', 'encount']
 LABELS = {
     'player': 'Player',
     'none': 'Not raced yet',
@@ -28,8 +28,7 @@ LABELS = {
     'complete': 'Defeated',
     'encount': 'Currently racing',
 }
-SWATCHES = {'player': '#FF6D00', 'none': '#2979FF', 'incomplete': '#FFD600',
-            'complete': '#00C853', 'encount': '#FF1744'}
+
 
 
 def draw_control_surface(canvas, color):
@@ -189,6 +188,8 @@ class App:
         self.busy = False
         self.events = queue.Queue()
         self.colors = {}
+        self.swatches = {}
+        self.applying_preset = False
         self.icon_image = None
         root.title('TXR Colorful Rivals')
         root.minsize(640, 480)
@@ -205,27 +206,43 @@ class App:
         build.ensure_data_files()
         config = build.read_config(build.DATA_ROOT / 'colors.json')
         settings = build.read_settings()
-        for row, key in enumerate(ORDER, 2):
+        self.preset = tk.StringVar()
+        ttk.Label(frame, text='Preset').grid(row=2, column=0, sticky='w')
+        self.preset_selector = ttk.Combobox(
+            frame, textvariable=self.preset, values=(*PRESETS, 'Custom'),
+            state='readonly', width=66)
+        self.preset_selector.grid(row=2, column=1, columnspan=3, sticky='ew', pady=(0, 10))
+        self.preset_selector.bind('<<ComboboxSelected>>', self.select_preset)
+        for row, key in enumerate(ORDER, 3):
             variable = tk.StringVar(value=config['colors'][key] or '')
             self.colors[key] = variable
             ttk.Label(frame, text=LABELS[key]).grid(row=row, column=0, sticky='w', padx=(0, 14))
-            entry = FlatEntry(frame, variable, width=20)
-            entry.grid(row=row, column=1, sticky='ew', pady=3)
+            field = ttk.Frame(frame)
+            field.grid(row=row, column=1, sticky='ew', pady=3)
+            swatch = tk.Canvas(field, width=20, height=20, highlightthickness=0,
+                               borderwidth=0, background=BACKGROUND)
+            swatch.pack(side='left', padx=(0, 8))
+            self.swatches[key] = swatch
+            entry = FlatEntry(field, variable, width=20)
+            entry.pack(side='left', fill='x', expand=True)
             FlatButton(frame, text='Choose…', command=lambda k=key: self.pick(k)).grid(
                 row=row, column=2, padx=6)
             FlatButton(frame, text='Original', command=lambda v=variable: v.set('')).grid(
                 row=row, column=3)
+        for variable in self.colors.values():
+            variable.trace_add('write', self.colors_changed)
+        self.colors_changed()
         self.game = tk.StringVar(value=settings['game_path'] or '')
-        ttk.Label(frame, text='Game folder').grid(row=7, column=0, sticky='w', pady=(18, 4))
+        ttk.Label(frame, text='Game folder').grid(row=8, column=0, sticky='w', pady=(18, 4))
         game_entry = FlatEntry(frame, self.game)
-        game_entry.grid(row=7, column=1, columnspan=2, sticky='ew',
+        game_entry.grid(row=8, column=1, columnspan=2, sticky='ew',
                         padx=(0, 6), pady=(18, 4))
         FlatButton(frame, text='Browse…', command=self.browse_game).grid(
-            row=7, column=3, pady=(18, 4))
-        FlatButton(frame, text='Find game', command=self.detect).grid(row=8, column=3, pady=5)
-        ttk.Label(frame, text='Close Tokyo Xtreme Racer before installing.').grid(row=8, column=0, columnspan=3, sticky='w')
+            row=8, column=3, pady=(18, 4))
+        FlatButton(frame, text='Find game', command=self.detect).grid(row=9, column=3, pady=5)
+        ttk.Label(frame, text='Close Tokyo Xtreme Racer before installing.').grid(row=9, column=0, columnspan=3, sticky='w')
         buttons = ttk.Frame(frame)
-        buttons.grid(row=9, column=0, columnspan=4, sticky='ew', pady=12)
+        buttons.grid(row=10, column=0, columnspan=4, sticky='ew', pady=12)
         self.save_button = FlatButton(buttons, text='Save settings', command=self.save_clicked)
         self.save_button.pack(side='left')
         self.build_button = FlatButton(buttons, text='Build only', command=lambda: self.start(False))
@@ -233,14 +250,37 @@ class App:
         self.install_button = FlatButton(buttons, text='Build and install', command=lambda: self.start(True))
         self.install_button.pack(side='left')
         self.status = tk.StringVar(value='Ready')
-        ttk.Label(frame, textvariable=self.status).grid(row=10, column=0, columnspan=4, sticky='w')
+        ttk.Label(frame, textvariable=self.status).grid(row=11, column=0, columnspan=4, sticky='w')
         self.log = FlatText(frame, rows=8, columns=70)
-        self.log.grid(row=11, column=0, columnspan=4, sticky='nsew', pady=(8, 0))
-        frame.rowconfigure(11, weight=1)
+        self.log.grid(row=12, column=0, columnspan=4, sticky='nsew', pady=(8, 0))
+        frame.rowconfigure(12, weight=1)
         root.protocol('WM_DELETE_WINDOW', self.close)
         root.after(100, self.poll)
         if not self.game.get():
             root.after(10, self.detect)
+
+    def colors_changed(self, *_args):
+        if self.applying_preset:
+            return
+        values = {key: variable.get() for key, variable in self.colors.items()}
+        self.preset.set(matching_preset(values))
+        for key, swatch in self.swatches.items():
+            color = effective_color(key, values[key])
+            swatch.delete('all')
+            swatch.configure(background=color or CONTROL)
+            if color is None:
+                swatch.create_line(3, 3, 17, 17, fill=CONTROL_TEXT, width=2)
+                swatch.create_line(3, 17, 17, 3, fill=CONTROL_TEXT, width=2)
+
+    def select_preset(self, _event=None):
+        palette = PRESETS.get(self.preset.get(), {})
+        self.applying_preset = True
+        try:
+            for key, variable in self.colors.items():
+                variable.set(palette.get(key, ''))
+        finally:
+            self.applying_preset = False
+        self.colors_changed()
 
     def apply_icon(self):
         icon = build.RESOURCE_ROOT / 'assets' / 'TXR.ico'
@@ -258,7 +298,20 @@ class App:
         style = ttk.Style(self.root)
         if 'clam' in style.theme_names():
             style.theme_use('clam')
-        style.configure('TFrame', background=BACKGROUND)
+        style.configure('TCombobox', fieldbackground=CONTROL, background=CONTROL,
+                        foreground=CONTROL_TEXT, arrowcolor=CONTROL_TEXT,
+                        borderwidth=0, padding=6)
+        style.map('TCombobox', fieldbackground=[('active', ACCENT), ('readonly', CONTROL)],
+                  background=[('active', ACCENT)], foreground=[('readonly', CONTROL_TEXT)],
+                  selectbackground=[('readonly', CONTROL)],
+                  selectforeground=[('readonly', CONTROL_TEXT)],
+                  bordercolor=[('!disabled', BACKGROUND)],
+                  lightcolor=[('!disabled', BACKGROUND)], darkcolor=[('!disabled', BACKGROUND)])
+        self.root.option_add('*TCombobox*Listbox.background', CONTROL)
+        self.root.option_add('*TCombobox*Listbox.foreground', CONTROL_TEXT)
+        self.root.option_add('*TCombobox*Listbox.selectBackground', ACCENT)
+        self.root.option_add('*TCombobox*Listbox.selectForeground', CONTROL_TEXT)
+        style.configure('TFrame' , background=BACKGROUND)
         style.configure('TLabel', background=BACKGROUND, foreground=FOREGROUND)
         style.configure('Header.TLabel', background=BACKGROUND, foreground=ACCENT)
 
@@ -267,8 +320,8 @@ class App:
         try:
             build.rgb(value)
         except ValueError:
-            value = SWATCHES[key]
-        chosen = colorchooser.askcolor(value, title=f'{key.title()} color', parent=self.root)[1]
+            value = ORIGINAL[key]
+        chosen = colorchooser.askcolor(value, title=f'{LABELS[key]} color', parent=self.root)[1]
         if chosen:
             self.colors[key].set(chosen.upper())
 
