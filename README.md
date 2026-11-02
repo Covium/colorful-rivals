@@ -1,159 +1,92 @@
-# Colorful Rivals for Tokyo Xtreme Racer
+# Colorful Rivals
 
-Colorful Rivals replaces Tokyo Xtreme Racer's rival-marker palette in the world, on the minimap, and on the full map. It supports five gameplay states:
+Tokyo Xtreme Racer uses similar yellow and green colors for rivals you have raced and rivals you have defeated. Those states can be difficult to distinguish, especially with red-green color blindness. Colorful Rivals lets you choose colors that are easier to tell apart.
+
+It changes rival map markers and in-world names, with ready-made presets and a configurator for creating your own palette.
+
+## Features
+
+Customize all five states:
 
 - **Player** — your own marker.
-- **Not raced yet** — an opponent you have not raced.
-- **Raced, not won** — an opponent whose previous races ended in a draw or defeat.
-- **Defeated** — an opponent you have beaten.
+- **Not raced yet** — rivals you have not raced.
+- **Raced, not won** — rivals whose previous races ended in a loss or draw.
+- **Defeated** — rivals you have beaten.
 - **Currently racing** — the opponent in your active race.
 
-The game's white `Unknown_None` marker and its second atlas column do not appear to be used. Their assets remain in the template for future investigation, but the configurator preserves them byte-for-byte and does not expose them as a setting.
-
-## Downloads
-
-GitHub releases provide these downloads:
-
-1. **Colorful-Rivals-Presets** contains all six ready-made presets in separate folders. It does not contain or run a program.
-2. Five platform-specific archives contain the configurator for Windows x64, Linux x64, Linux ARM64, macOS Intel, and macOS Apple Silicon. These archives are intended to be listed separately on Nexus Mods so users can download only the build they need.
-
-The compiled configurator includes Python, its graphical interface, the asset template, and the correct [retoc](https://github.com/trumank/retoc) 0.1.5 executable for its platform. Users do not need to install Python, Tkinter, retoc, a command-line shell, or any other dependency.
-
-The executables are currently unsigned. Windows SmartScreen or macOS Gatekeeper may therefore ask you to confirm that you want to run a downloaded build. Release archives include the source repository's documentation and third-party license texts so the build can be audited.
+The configurator lets you use your system's color picker or enter a `#RRGGBB` value. Leave a field empty to keep the game's original color for that state. It can find the game in your Steam libraries and back up previously installed palettes before replacing them.
 
 ## Ready-made presets
 
-Choose one of these folders. The same presets are available in the application:
+The presets archive contains six palettes:
 
-- **Vibrant - Brighter colors** — more saturated versions of the game's familiar colors; the default.
-- **Blue & Gold - Protanomaly and deuteranomaly**
-- **Blue & Gold - Stronger separation, protanopia and deuteranopia**
-- **Coral & Cyan - Tritanomaly**
-- **Coral & Cyan - Stronger separation, tritanopia**
-- **Grayscale - Experimental, monochromacy**
+| Preset | Intended use |
+| --- | --- |
+| Vibrant | Brighter versions of the game's familiar colors |
+| Blue & Gold | Protanomaly and deuteranomaly |
+| Blue & Gold — Stronger separation | Protanopia and deuteranopia |
+| Coral & Cyan | Tritanomaly |
+| Coral & Cyan — Stronger separation | Tritanopia |
+| Grayscale | Experimental palette for monochromacy |
 
-The intended-use names describe proposed starting points, not validated accessibility guarantees. Try them in the game and adjust them to your vision and display. Grayscale relies entirely on brightness differences; darker markers may be harder to see against dark scenery.
+Use these as starting points and choose what works for your vision and display. Grayscale depends on brightness alone, so darker markers can be harder to see against dark scenery.
 
-Close the game and place all three `RivalColors_Config_P` files (`.pak`, `.ucas`, and `.utoc`) from **one** preset folder in:
+### Installation
 
-```text
-TokyoXtremeRacer/TokyoXtremeRacer/Content/Paks/~mods
-```
+1. Close the game and extract the presets archive.
+2. Choose one preset folder.
+3. Copy its `.pak`, `.ucas`, and `.utoc` files into:
 
-Create `~mods` if it does not exist. Remove older `RivalColors*` files before launching the game, and keep the three new files together. All presets use the same filenames: install only one palette at a time.
+   ```text
+   <GAME_LOCATION>/TokyoXtremeRacer/Content/Paks/~mods
+   ```
+
+Create `~mods` if it does not exist. Remove older `RivalColors*` files first, and keep the three new files together. Install only one palette at a time.
+
+To switch presets, close the game and replace the three files with those from the other folder.
+
+To uninstall, close the game and remove `RivalColors_Config_P.pak`, `RivalColors_Config_P.ucas`, and `RivalColors_Config_P.utoc` from `~mods`.
 
 ## Custom colors
 
-Extract the archive for your platform and open the application:
+Download the configurator for your operating system and CPU architecture: Windows x64, Linux x64 or ARM64, or macOS Intel or Apple Silicon. No additional software is required; Python, Tkinter, and retoc are included.
 
-- Windows: `Colorful Rivals.exe`
-- Linux: `colorful-rivals`
-- macOS: `Colorful Rivals.app`
+1. Extract the archive and open **Colorful Rivals**.
+2. Choose a preset or set your own colors.
+3. Select your TXR installation folder if it was not found automatically.
+4. Close the game and press **Build and install**.
 
-Linux normally retains the executable permission when extracted. If your archive program removes it, run `chmod +x colorful-rivals` once.
+Alternatively, **Build only** creates the files for manual installation under `Colorful Rivals Data/builds`. **Save settings** remembers your colors and game location without building.
 
-The configurator attempts to locate Tokyo Xtreme Racer in your Steam libraries. If it cannot find the game, select its installation folder. Choose a color for each state, close the game, and select **Build and install**. Restart the game afterwards.
+The application stores settings, builds, and installation backups in `Colorful Rivals Data` beside the executable or macOS app. Existing `RivalColors*` files are backed up before installation; other mod filenames are left alone.
 
-The **Preset** menu starts with **Vibrant** on a fresh installation. Existing saved colors are restored. Selecting a preset fills all five fields. Manual changes switch the menu to **Custom**, or to the matching preset when all five colors match it. Selecting **Custom** clears every field so the original game colors are used.
+The applications are unsigned, so Windows SmartScreen or macOS Gatekeeper may show a prompt. On Linux, if your archive tool removes executable permissions, run `chmod +x colorful-rivals`.
 
-The square before each HEX field previews its color; an empty field previews the game's original color. An incomplete or invalid HEX value shows a crossed square until corrected.
+## How it works
 
-**Build only** creates the package without changing the game. **Original** leaves that state's exact original data in place. **Save settings** records the colors and game location without building.
+Each build starts from the original marker textures and UI assets, applies your selected colors, and packages the result as an Unreal Engine mod using retoc. Texture transparency, animation timing, and asset references are preserved. The builder verifies the packaged assets before installation.
 
-The application creates `Colorful Rivals Data` beside the executable or macOS app. It stores the selected colors, game location, generated builds, and installation backups. Deleting this directory resets the settings without damaging the application.
-
-Each build creates a timestamped directory under `Colorful Rivals Data/builds` containing `RivalColors_Config_P.pak`, `.ucas`, and `.utoc`, plus a configuration snapshot and report. Installation backs up existing `RivalColors*` files from the game's Paks tree into `Colorful Rivals Data/backups` before replacing them. Other mod filenames are untouched. If installation fails, the previous files are restored.
-
-Every build starts from a hash-checked original asset template and verifies container integrity, package paths, and every packaged asset's bytes. Texture transparency, the red atlas backing area, animation timing, visibility, and asset references are preserved.
-
-The template is tied to the tested version of the game. A future game update may require refreshed assets. Mods replacing the same widgets, text styles, or marker textures can conflict.
+The game loads the replacement assets from `~mods` when it starts. Mods that replace the same marker textures, widgets, or text styles may conflict, and future game updates may require a refreshed asset template.
 
 ## Building from source
 
-The readable Python files are the source of the compiled application. End users do not need Python; maintainers need Python 3.12 to run tests or create executables.
+Requires Python 3.12 and a native build environment for the target operating system. To prepare a Windows build:
 
-Run the tests:
-
-```sh
-python -m unittest discover -p "test*.py"
-```
-
-After making changes to `palettes.py`, regenerate the ready-made packages with the bundled or fetched retoc available:
-
-```sh
-python scripts/build_presets.py
-```
-
-This uses the application's verified builder for every palette and writes the three installable files into each named `presets` folder. The release archive includes all of those folders.
-
-Install the pinned build tool, fetch the pinned retoc executable for your platform, collect the runtime licenses, and build:
-
-```sh
+```powershell
 python -m pip install -r requirements-build.txt
 python scripts/fetch_retoc.py --platform windows-x86_64 --output vendor/retoc
 python scripts/fetch_runtime_licenses.py
-```
-
-On Windows PowerShell:
-
-```powershell
 $env:RETOC_BINARY = "$PWD/vendor/retoc/retoc.exe"
 $env:COLORFUL_RIVALS_APP_NAME = "Colorful Rivals"
 pyinstaller --noconfirm --clean "Colorful Rivals.spec"
 ```
 
-Use `linux-x86_64`, `linux-aarch64`, `macos-x86_64`, or `macos-aarch64` instead when building natively on those platforms. PyInstaller creates native applications, so each target must be built on that target operating system and architecture.
+For other platforms, use the matching `linux-x86_64`, `linux-aarch64`, `macos-x86_64`, or `macos-aarch64` tool download and build natively on that system. Set `RETOC_BINARY` to the downloaded executable's path.
 
-`retoc-lock.json` pins every official retoc 0.1.5 release asset and its published SHA-256. `scripts/fetch_retoc.py` refuses an archive whose hash differs. A Git submodule is not used because submodules pin source commits rather than release executables.
+Run the tests with `python -m unittest discover -p "test*.py"`. To regenerate the ready-made palettes after editing `palettes.py`, run `python scripts/build_presets.py` with retoc available.
 
-## Manual GitHub releases
+## Credits and license
 
-The **Build release** workflow runs only through GitHub's **Run workflow** button. Enter a version without a leading `v` and choose one mode:
+Built with [retoc](https://github.com/trumank/retoc). FModel, RE-UE4SS, UAssetGUI/UAssetAPI, and Pillow helped locate, inspect, and modify the game assets. Thanks to their authors and contributors; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for full credits and licenses.
 
-- **artifacts-only** builds and tests every platform and uploads one review bundle to the workflow run. It creates no tag and no GitHub release. This is the default.
-- **draft** creates an unpublished draft GitHub release.
-- **prerelease** creates a visible prerelease.
-- **release** creates a normal public release.
-
-Every successful run produces:
-
-- five platform archives: Windows x64, Linux x64, Linux ARM64, macOS Intel, and macOS Apple Silicon;
-- `Colorful-Rivals-Presets`, containing the ready-made `.pak`, `.ucas`, and `.utoc` files for the primary Nexus Mods download.
-
-## Nexus Mods publishing
-
-Before publishing a normal release, add a repository **Actions secret** named
-`NEXUS_API_KEY` under **Settings → Secrets and variables → Actions → New repository secret**.
-Paste your Nexus API key into its value. Do not use a plain repository variable or commit the key.
-
-The manual **Build release** workflow uploads to Nexus after successfully creating
-a normal GitHub release (`release` mode). Drafts, prereleases, and artifacts-only
-runs do not publish to Nexus. A missing key stops a normal release before building.
-Releases created outside this workflow are not automatically uploaded to Nexus.
-
-Each Nexus upload uses the exact archive from the matching GitHub release and its
-version without the `v` prefix. The preset listing becomes **Colorful Rivals Presets**;
-the GitHub ZIP is named `Colorful-Rivals-Presets-<version>.zip` and includes
-the entire `presets` directory. Presets and Windows are main files; Linux and macOS
-are optional files. Successful updates archive the corresponding previous version.
-The numeric file IDs in the workflow identify the six existing listings; the short
-unique IDs are not needed by the upload action.
-
-The optional **changelog** workflow input supplies release notes for both sites.
-If omitted, GitHub generates the notes from commits. The preset upload adds those
-notes to mod `31159987732670` once and updates the mod's displayed version.
-The official Nexus upload action is pinned to a revision with changelog support.
-
-Uploads are individual operations, so a Nexus failure can leave some files updated
-and others unchanged while the GitHub release remains available. Inspect each Nexus
-job's log and summary before retrying; rerunning a successful upload can create a
-duplicate version. If a job fails after creating the file version but while posting
-the changelog, repair the changelog separately rather than uploading that file again.
-
-## Credits and licenses
-
-Colorful Rivals embeds retoc under its MIT License and includes all required runtime license texts in release archives. FModel, UE4SS, UAssetGUI/UAssetAPI, and Pillow were used while locating, inspecting, modifying, and checking the game assets. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for authors, links, licenses, and the complete tool credits.
-
-Colorful Rivals is distributed under the [MIT License](LICENSE).
-
-Tokyo Xtreme Racer and its game assets belong to their respective rights holders. Colorful Rivals is an unofficial community mod and is not affiliated with or endorsed by Genki.
+Colorful Rivals is distributed under the [MIT License](LICENSE). Tokyo Xtreme Racer and its game assets belong to their respective rights holders.
