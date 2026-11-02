@@ -126,6 +126,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
       - uses: actions/download-artifact@v8
         with:
           pattern: platform-*
@@ -153,12 +155,8 @@ jobs:
           RELEASE_CHANGELOG: ${{ inputs.changelog }}
         run: |
           options=()
-          if [[ -n "$RELEASE_CHANGELOG" ]]; then
-            printf '%s\n' "$RELEASE_CHANGELOG" > release-notes.md
-            options+=(--notes-file release-notes.md)
-          else
-            options+=(--generate-notes)
-          fi
+          python3 scripts/release_notes.py --target "$GITHUB_SHA" --output release-notes.md
+          options+=(--notes-file release-notes.md)
           if [[ "$RELEASE_MODE" == "draft" ]]; then options+=(--draft); fi
           if [[ "$RELEASE_MODE" == "prerelease" ]]; then options+=(--prerelease); fi
           gh release create "v$RELEASE_VERSION" release-assets/*.zip \
